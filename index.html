@@ -1224,8 +1224,8 @@
       view.setUint16(p, rec.nameLen, true); p += 2;
       view.setUint16(p, 0, true); p += 2;                    // extra length
       const nameBytes = strToBytes(rec.name); // recompute name bytes
-      for (let i = 0; i < nameLen; i++) view.setUint8(p + i, nameBytes[i]);
-      p += nameLen;
+      for (let i = 0; i < rec.nameLen; i++) view.setUint8(p + i, nameBytes[i]);
+      p += rec.nameLen;
       for (let i = 0; i < rec.size; i++) view.setUint8(p + i, rec.data[i]);
       p += rec.size;
     }
