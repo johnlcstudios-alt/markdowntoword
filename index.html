@@ -1,1 +1,1369 @@
-<html><body><h1>Aura Edition</h1></body></html>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Markdown to Word Converter — Aura Edition">
+<title>Markdown to Word | Aura Edition</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233730A3'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-weight='800' font-size='16' text-anchor='middle' fill='white'%3EA%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root {
+    /* --- Midnight Obsidian Palette --- */
+    --obsidian-base: #0f172a;
+    --obsidian-surface: #1e293b;
+    --obsidian-light: #334155;
+    --obsidian-border: #475569;
+    --aura-indigo: #3730A3;
+    --aura-indigo-light: #6366f1;
+    --aura-accent: #06b6d4;
+    --aura-success: #10b981;
+    --aura-warning: #f59e0b;
+    --aura-text: #f1f5f9;
+    --aura-text-muted: #94a3b8;
+    --aura-text-dim: #64748b;
+    --aura-glass-bg: rgba(15, 23, 42, 0.55);
+    --aura-glass-border: rgba(255, 255, 255, 0.08);
+    --aura-glass-hover: rgba(255, 255, 255, 0.12);
+    --aura-blur: 10px;
+    --aura-radius: 20px;
+    --aura-radius-sm: 10px;
+    --aura-gradient: linear-gradient(135deg, #3730A3 0%, #06b6d4 100%);
+    --aura-gradient-radial: radial-gradient(circle at top right, rgba(99, 102, 241, 0.25), transparent 50%);
+    --aura-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    --aura-shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --font-heading: "Outfit", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "Fira Code", monospace;
+  }
+
+  [data-theme="light"] {
+    --obsidian-base: #f8fafc;
+    --obsidian-surface: #ffffff;
+    --obsidian-light: #e2e8f0;
+    --obsidian-border: #cbd5e1;
+    --aura-indigo: #3730A3;
+    --aura-indigo-light: #4f46e5;
+    --aura-accent: #0891b2;
+    --aura-text: #0f172a;
+    --aura-text-muted: #475569;
+    --aura-text-dim: #64748b;
+    --aura-glass-bg: rgba(255, 255, 255, 0.7);
+    --aura-glass-border: rgba(0, 0, 0, 0.06);
+    --aura-glass-hover: rgba(0, 0, 0, 0.04);
+    --aura-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+    --aura-shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--obsidian-base);
+    background-image: var(--aura-gradient-radial);
+    color: var(--aura-text);
+    transition: background-color var(--transition-normal), background-image var(--transition-normal);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6, .brand-text, .pane-title, .feature-title h2 { font-family: var(--font-heading); }
+
+  /* ---------- Scrollbar ---------- */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--obsidian-light); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--aura-indigo-light); }
+
+  /* ---------- Utilities ---------- */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+  .fade-in { animation: fadeIn var(--transition-normal) both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Navbar ---------- */
+  .aura-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--aura-glass-bg);
+    backdrop-filter: blur(var(--aura-blur));
+    -webkit-backdrop-filter: blur(var(--aura-blur));
+    border-bottom: 1px solid var(--aura-glass-border);
+    transition: background var(--transition-normal);
+  }
+  .nav-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .brand-logo {
+    background: var(--aura-gradient);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 15px rgba(55, 48, 163, 0.4);
+    flex-shrink: 0;
+  }
+  .brand-text {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--aura-text);
+  }
+  .brand-text span { color: var(--aura-indigo-light); }
+
+  .nav-tools { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+
+  .theme-switch {
+    background: var(--obsidian-surface);
+    border: 1px solid var(--aura-glass-border);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    color: var(--aura-text);
+    font-size: 1.1rem;
+  }
+  .theme-switch:hover { background: var(--obsidian-light); transform: scale(1.08); }
+  .sun { display: none; }
+  [data-theme="dark"] .moon { display: none; }
+  [data-theme="dark"] .sun { display: block; }
+
+  .nav-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.55rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: var(--aura-text);
+  }
+  .nav-action.secondary {
+    background: var(--obsidian-surface);
+    border-color: var(--aura-glass-border);
+    color: var(--aura-text-muted);
+  }
+  .nav-action.secondary:hover { background: var(--obsidian-light); color: var(--aura-text); border-color: var(--aura-indigo-light); }
+  .nav-action.primary {
+    background: var(--aura-gradient);
+    color: white;
+    box-shadow: 0 4px 15px rgba(55, 48, 163, 0.3);
+  }
+  .nav-action.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(55, 48, 163, 0.45); }
+  .nav-action:active { transform: scale(0.97); }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 110%;
+    min-width: 170px;
+    background: var(--obsidian-surface);
+    border: 1px solid var(--aura-glass-border);
+    border-radius: var(--aura-radius);
+    box-shadow: var(--aura-shadow);
+    backdrop-filter: blur(var(--aura-blur));
+    -webkit-backdrop-filter: blur(var(--aura-blur));
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: var(--transition-normal);
+    padding: 0.5rem 0;
+    z-index: 2000;
+  }
+  .dropdown.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0.65rem 1.25rem;
+    background: transparent;
+    border: none;
+    color: var(--aura-text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: left;
+    transition: var(--transition-fast);
+  }
+  .dropdown-item:hover { background: var(--aura-glass-hover); color: var(--aura-accent); }
+  .dropdown-item .kbd { font-family: var(--font-mono); font-size: 0.75rem; background: var(--obsidian-light); padding: 1px 6px; border-radius: 4px; color: var(--aura-accent); margin-left: auto; }
+
+  /* ---------- Hero ---------- */
+  .aura-hero {
+    text-align: center;
+    padding: 4.5rem 1.5rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .aura-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(55, 48, 163, 0.15);
+    color: var(--aura-indigo-light);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid rgba(55, 48, 163, 0.35);
+    margin-bottom: 1.25rem;
+    backdrop-filter: blur(4px);
+  }
+  .aura-pill svg { width: 14px; height: 14px; }
+  .aura-hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+  }
+  .aura-gradient {
+    background: var(--aura-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .aura-hero p {
+    color: var(--aura-text-muted);
+    font-size: 1.1rem;
+    max-width: 560px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+
+  /* ---------- Converter Card ---------- */
+  .converter-container {
+    padding: 0 1.5rem 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .aura-glass-card {
+    background: var(--aura-glass-bg);
+    backdrop-filter: blur(var(--aura-blur));
+    -webkit-backdrop-filter: blur(var(--aura-blur));
+    border: 1px solid var(--aura-glass-border);
+    border-radius: var(--aura-radius);
+    box-shadow: var(--aura-shadow);
+    overflow: hidden;
+    animation: fadeIn 0.6s both;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid var(--aura-glass-border);
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; font-weight: 600; color: var(--aura-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .status-indicator {
+    width: 8px; height: 8px;
+    background: var(--aura-success);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--aura-success);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .status-text { color: var(--aura-text-muted); }
+
+  .header-right { display: flex; align-items: center; gap: 0.75rem; }
+
+  /* ---------- Workspace ---------- */
+  .workspace {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    height: 560px;
+  }
+  .workspace-pane { display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.08); }
+  .workspace-pane + .workspace-pane { border-left: 1px solid var(--aura-glass-border); }
+  .pane-title {
+    padding: 0.7rem 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--aura-text-muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--aura-glass-border);
+    background: rgba(0,0,0,0.12);
+    letter-spacing: 0.12em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pane-actions { display: flex; gap: 0.4rem; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--aura-glass-border);
+    color: var(--aura-text-muted);
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+  }
+  .icon-btn:hover { background: var(--aura-glass-hover); color: var(--aura-text); border-color: var(--aura-indigo-light); }
+
+  textarea.md-input {
+    width: 100%; height: 100%; border: none; padding: 1.5rem;
+    font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.7;
+    resize: none; outline: none; background: transparent; color: var(--aura-text);
+    overflow-y: auto;
+  }
+  textarea.md-input::placeholder { color: var(--aura-text-dim); opacity: 0.6; }
+
+  .preview-content {
+    width: 100%; height: 100%; padding: 1.75rem; overflow-y: auto;
+    background: transparent; color: var(--aura-text);
+  }
+  .preview-content h1, .preview-content h2, .preview-content h3, .preview-content h4 {
+    margin-top: 1.75rem; margin-bottom: 0.75rem; color: var(--aura-text);
+    border-bottom: 1px solid var(--aura-glass-border); padding-bottom: 0.4rem;
+    font-weight: 800;
+  }
+  .preview-content h1 { font-size: 1.9rem; border-bottom-width: 2px; border-bottom-color: var(--aura-indigo-light); }
+  .preview-content h2 { font-size: 1.6rem; }
+  .preview-content h3 { font-size: 1.35rem; }
+  .preview-content p { margin-bottom: 1rem; }
+  .preview-content a { color: var(--aura-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .preview-content code {
+    background: var(--obsidian-surface); padding: 2px 6px; border-radius: 6px;
+    font-family: var(--font-mono); font-size: 0.85em; color: var(--aura-accent);
+    border: 1px solid var(--obsidian-border);
+  }
+  .preview-content pre {
+    background: var(--obsidian-base); border: 1px solid var(--obsidian-border);
+    border-radius: var(--aura-radius-sm); padding: 1rem; overflow-x: auto;
+    margin: 1.25rem 0;
+  }
+  .preview-content pre code { background: transparent; padding: 0; border: none; color: inherit; font-size: 0.85rem; }
+  .preview-content blockquote {
+    border-left: 4px solid var(--aura-indigo-light);
+    margin: 1.25rem 0; padding: 0.75rem 1.25rem;
+    background: rgba(55,48,163,0.08); border-radius: 0 var(--aura-radius-sm) var(--aura-radius-sm) 0;
+    color: var(--aura-text-muted);
+  }
+  .preview-content ul, .preview-content ol { margin: 1rem 0 1rem 1.5rem; }
+  .preview-content li { margin-bottom: 0.4rem; }
+  .preview-content table {
+    width: 100%; border-collapse: collapse; margin: 1.25rem 0;
+    font-size: 0.9rem;
+  }
+  .preview-content th, .preview-content td {
+    border: 1px solid var(--obsidian-border); padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .preview-content th { background: var(--obsidian-surface); color: var(--aura-indigo-light); font-weight: 700; }
+  .preview-content hr {
+    border: none; border-top: 1px solid var(--obsidian-border); margin: 1.5rem 0;
+  }
+
+  /* ---------- Stats ---------- */
+  .stats-bar {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--obsidian-surface);
+    border-top: 1px solid var(--aura-glass-border);
+    border-bottom: 1px solid var(--aura-glass-border);
+    font-size: 0.8rem;
+    color: var(--aura-text-muted);
+  }
+  .stat { display: flex; align-items: center; gap: 0.5rem; }
+  .stat strong { color: var(--aura-text); font-variant-numeric: tabular-nums; }
+  .stat-divider { width: 1px; height: 14px; background: var(--aura-glass-border); }
+
+  /* ---------- Features ---------- */
+  .aura-features { padding: 4rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .feature-title { text-align: center; margin-bottom: 3rem; }
+  .feature-title h2 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; }
+  .feature-title p { color: var(--aura-text-muted); font-size: 1.05rem; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .feature-item {
+    padding: 2rem; background: var(--aura-glass-bg);
+    backdrop-filter: blur(var(--aura-blur)); -webkit-backdrop-filter: blur(var(--aura-blur));
+    border: 1px solid var(--aura-glass-border); border-radius: var(--aura-radius);
+    text-align: center; transition: var(--transition-normal);
+  }
+  .feature-item:hover { transform: translateY(-8px); box-shadow: var(--aura-shadow-sm); border-color: var(--aura-indigo-light); }
+  .f-badge {
+    width: 44px; height: 44px; background: var(--aura-gradient);
+    color: white; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; margin: 0 auto 1.25rem;
+    font-weight: 800; font-size: 1rem; box-shadow: 0 4px 15px rgba(55,48,163,0.35);
+  }
+  .feature-item h3 { font-size: 1.1rem; margin-bottom: 0.6rem; }
+  .feature-item p { color: var(--aura-text-muted); font-size: 0.9rem; line-height: 1.55; }
+
+  /* ---------- Templates ---------- */
+  .aura-templates { padding: 0 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .template-section { margin-bottom: 3rem; }
+  .template-section h3 { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--aura-text-muted); margin-bottom: 1rem; }
+  .template-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .template-btn {
+    background: var(--obsidian-surface);
+    border: 1px solid var(--aura-glass-border);
+    color: var(--aura-text);
+    padding: 1rem; border-radius: var(--aura-radius-sm);
+    font-size: 0.82rem; text-align: left; cursor: pointer;
+    transition: var(--transition-normal); line-height: 1.45;
+  }
+  .template-btn:hover { border-color: var(--aura-indigo-light); background: var(--obsidian-light); transform: translateY(-3px); box-shadow: var(--aura-shadow-sm); }
+  .template-btn .t-title { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 0.25rem; color: var(--aura-indigo-light); }
+  .template-btn .t-desc { color: var(--aura-text-muted); font-size: 0.75rem; }
+
+  /* ---------- Footer ---------- */
+  .aura-footer {
+    margin-top: auto; padding: 2.5rem 1.5rem;
+    text-align: center; color: var(--aura-text-muted);
+    font-size: 0.8rem; border-top: 1px solid var(--aura-glass-border);
+    background: rgba(0,0,0,0.1);
+  }
+
+  /* ---------- Toast ---------- */
+  .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none; }
+  .toast {
+    background: var(--obsidian-surface);
+    border: 1px solid var(--aura-glass-border);
+    color: var(--aura-text);
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--aura-radius-sm);
+    box-shadow: var(--aura-shadow-sm);
+    backdrop-filter: blur(var(--aura-blur));
+    -webkit-backdrop-filter: blur(var(--aura-blur));
+    display: flex; align-items: center; gap: 0.8rem;
+    min-width: 260px;
+    pointer-events: auto;
+    animation: slideIn var(--transition-bounce) both;
+    border-left: 4px solid var(--aura-accent);
+  }
+  .toast.success { border-left-color: var(--aura-success); }
+  .toast.warn { border-left-color: var(--aura-warning); }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+  .toast-title { font-weight: 700; font-size: 0.9rem; }
+  .toast-msg { font-size: 0.8rem; color: var(--aura-text-muted); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 992px) {
+    .workspace { grid-template-columns: 1fr; height: auto; }
+    .workspace-pane { height: 380px; border-left: none; border-bottom: 1px solid var(--aura-glass-border); }
+    .workspace-pane + .workspace-pane { border-top: none; }
+    .template-grid { grid-template-columns: repeat(2, 1fr); }
+    .card-header { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+    .header-right { justify-content: center; width: 100%; }
+    .nav-container { gap: 0; }
+  }
+  @media (max-width: 600px) {
+    .template-grid { grid-template-columns: 1fr; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .nav-tools { gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="aura-nav">
+  <div class="nav-container">
+    <a href="#" class="brand">
+      <div class="brand-logo">A</div>
+      <div class="brand-text">Markdown<span style="color:var(--aura-indigo-light)">toWord</span></div>
+    </a>
+
+    <div class="nav-tools">
+      <button id="themeToggle" class="theme-switch" aria-label="Toggle theme">
+        <span class="sun">☀️</span><span class="moon">🌙</span>
+      </button>
+
+      <label for="fileInput" class="nav-action secondary" title="Import Markdown (.md)">
+        📂 Import .md
+        <input type="file" id="fileInput" accept=".md,.markdown,.txt" style="display:none;">
+      </label>
+
+      <div class="dropdown" id="exportDropdown">
+        <button class="nav-action primary" id="exportBtn" aria-haspopup="true" aria-expanded="false">
+          📥 Export <span style="font-size:0.8rem">▾</span>
+        </button>
+        <div class="dropdown-menu" id="exportMenu">
+          <button class="dropdown-item" data-fmt="docx"><strong>📘 Word (.docx)</strong><span class="kbd">Ctrl+S</span></button>
+          <button class="dropdown-item" data-fmt="html"><strong>🌐 Web Page (.html)</strong></button>
+          <button class="dropdown-item" data-fmt="md"><strong>📝 Markdown (.md)</strong></button>
+          <button class="dropdown-item" data-fmt="txt"><strong>📄 Plain Text (.txt)</strong></button>
+          <button class="dropdown-item" data-fmt="print"><strong>🖨️ Print / PDF</strong></button>
+        </div>
+      </div>
+
+      <button id="clearBtn" class="nav-action secondary" title="Clear editor">🗑️ Clear</button>
+    </div>
+  </div>
+</nav>
+
+<section class="aura-hero fade-in">
+  <div class="aura-pill">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+    Single-file · Client-side · No server
+  </div>
+  <h1>Markdown to <span class="aura-gradient">Professional Documents</span></h1>
+  <p>Glass-morphism editor with real-time preview and genuine <b>.docx</b> export — entirely in your browser. Nothing is uploaded.</p>
+</section>
+
+<main class="converter-container fade-in" style="animation-delay:0.15s;">
+
+  <div class="aura-glass-card">
+    <div class="card-header">
+      <div class="header-left">
+        <span class="status-indicator"></span>
+        <span class="status-text" id="statusText">Auto-saved to browser</span>
+      </div>
+      <div class="header-right">
+        <div class="dropdown" id="templateDropdown">
+          <button class="nav-action secondary" id="templateBtn">📄 Template ▾</button>
+          <div class="dropdown-menu" id="templateMenu" style="left:0;right:auto;"></div>
+        </div>
+        <button id="copyPreviewBtn" class="icon-btn" title="Copy preview to clipboard">📋</button>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <div class="workspace-pane editor-pane">
+        <div class="pane-title">Source Editor <span class="pane-actions">
+          <button class="icon-btn" id="expandEditor" title="Expand editor">↗</button>
+        </span></div>
+        <textarea id="mdInput" class="md-input" spellcheck="false" placeholder="Write your markdown here…&#10;&#10;# Hello World&#10;&#10;## A subtitle&#10;&#10;- Item one&#10;- Item two&#10;&#10;`inline code`&#10;&#10;[Aura](https://example.com)"></textarea>
+      </div>
+
+      <div class="workspace-pane preview-pane">
+        <div class="pane-title">Live Preview <span class="pane-actions">
+          <button class="icon-btn" id="expandPreview" title="Expand preview">↗</button>
+        </span></div>
+        <div id="preview" class="preview-content">
+          <p class="text-muted preview-placeholder">Preview appears here as you type.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">📝 <strong id="statsWords">0</strong> words</div>
+      <div class="stat-divider"></div>
+      <div class="stat">🔤 <strong id="statsChars">0</strong> characters</div>
+      <div class="stat-divider"></div>
+      <div class="stat">⏱️ <strong id="statsTime">0 min</strong> read</div>
+      <div class="stat-divider"></div>
+      <div class="stat" id="savedStatus" style="color:var(--aura-accent);">✓ saved</div>
+    </div>
+  </div>
+
+</main>
+
+<section class="aura-templates">
+  <div class="template-section">
+    <h3>Quick Templates</h3>
+    <div class="template-grid">
+      <button class="template-btn" data-template="blank">
+        <span class="t-title">Blank Document</span>
+        <span class="t-desc">Start from scratch</span>
+      </button>
+      <button class="template-btn" data-template="report">
+        <span class="t-title">Report</span>
+        <span class="t-desc">Structured report with headings</span>
+      </button>
+      <button class="template-btn" data-template="letter">
+        <span class="t-title">Letter</span>
+        <span class="t-desc">Professional letter format</span>
+      </button>
+      <button class="template-btn" data-template="resume">
+        <span class="t-title">Resume / CV</span>
+        <span class="t-desc">Clean résumé layout</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="aura-features">
+  <div class="feature-title">
+    <h2>AURA CORE Principles</h2>
+    <p>Built for completeness, performance, and privacy.</p>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-item">
+      <div class="f-badge">01</div>
+      <h3>Real .docx Export</h3>
+      <p>Generates a genuine Office Open XML document entirely client-side — no PHP, no server, no uploads.</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-badge">02</div>
+      <h3>Privacy First</h3>
+      <p>Your markdown never leaves your browser. Works offline once loaded; auto-saves locally.</p>
+    </div>
+    <div class="feature-item">
+      <div class="f-badge">03</div>
+      <h3>Dark &amp; Light</h3>
+      <p>Midnight Obsidian glass-morphism with an instant theme switch and system preference detection.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="aura-footer">
+  <p>Built with ❤️ by <strong>JohnLC Aura Design System</strong>. Single-file Aura Edition · <span id="year"></span></p>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ============================================================
+   Markdown to Word — Aura Edition (Single File)
+   Client-side markdown editor + genuine .docx export.
+   ============================================================ */
+
+(function () {
+  "use strict";
+
+  // ---------- Elements ----------
+  const mdInput = document.getElementById("mdInput");
+  const preview = document.getElementById("preview");
+  const statsWords = document.getElementById("statsWords");
+  const statsChars = document.getElementById("statsChars");
+  const statsTime = document.getElementById("statsTime");
+  const savedStatus = document.getElementById("savedStatus");
+  const statusText = document.getElementById("statusText");
+  const fileInput = document.getElementById("fileInput");
+  const exportDropdown = document.getElementById("exportDropdown");
+  const exportMenu = document.getElementById("exportMenu");
+  const exportBtn = document.getElementById("exportBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const copyPreviewBtn = document.getElementById("copyPreviewBtn");
+  const themeToggle = document.getElementById("themeToggle");
+  const templateBtn = document.getElementById("templateBtn");
+  const templateMenu = document.getElementById("templateMenu");
+  const expandEditor = document.getElementById("expandEditor");
+  const expandPreview = document.getElementById("expandPreview");
+  const toastContainer = document.getElementById("toastContainer");
+
+  // ---------- Marked setup ----------
+  const markedLib = typeof marked !== "undefined" ? marked : null;
+  if (markedLib && markedLib.use) {
+    try { markedLib.use({ gfm: true, breaks: true, mangle: false, headerIds: false }); } catch (e) {}
+  }
+
+  function parseMarkdown(text) {
+    if (markedLib) {
+      return markedLib.parse(text);
+    }
+    // Offline fallback (very light)
+    return fallbackParse(text);
+  }
+
+  function fallbackParse(text) {
+    let html = String(text)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/`(.+?)`/g, "<code>$1</code>")
+      .replace(/^#{1,6}\s*(.+)$/gm, function (m, t) {
+        var l = m.match(/^#+/)[0].length;
+        return "<h" + l + ">" + t + "</h" + l + ">";
+      })
+      .replace(/^\s*[-*+]\s(.+)$/gm, "<li>$1</li>")
+      .replace(/\n\n+/g, "</p><p>")
+      .replace(/\n/g, "<br>");
+    return "<p>" + html + "</p>";
+  }
+
+  // ---------- Theme ----------
+  const THEME_KEY = "mtw_theme";
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(THEME_KEY, theme);
+    updateThemeIcons();
+  }
+  function updateThemeIcons() {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    themeToggle.querySelector(".sun").style.display = dark ? "block" : "none";
+    themeToggle.querySelector(".moon").style.display = dark ? "none" : "block";
+  }
+  function loadTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    setTheme(saved || getSystemTheme());
+  }
+  themeToggle.addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    setTheme(cur === "light" ? "dark" : "light");
+  });
+
+  // ---------- Rendering / Stats ----------
+  let renderTimer;
+  let saveTimer;
+
+  function escXml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+  }
+
+  function render() {
+    const md = mdInput.value;
+    const html = parseMarkdown(md);
+    preview.innerHTML = html;
+    const placeholder = preview.querySelector(".preview-placeholder");
+    if (placeholder) placeholder.style.display = md.trim() ? "none" : "block";
+    updateStats(md);
+    scheduleSave(md);
+  }
+
+  function updateStats(md) {
+    const trimmed = md.trim();
+    const words = trimmed === "" ? 0 : trimmed.split(/\s+/).filter(Boolean).length;
+    const chars = md.length;
+    const minutes = Math.max(1, Math.ceil(words / 200));
+    statsWords.textContent = words.toLocaleString();
+    statsChars.textContent = chars.toLocaleString();
+    statsTime.textContent = minutes + " min read";
+  }
+
+  function scheduleSave(md) {
+    clearTimeout(saveTimer);
+    savedStatus.textContent = "● saving";
+    savedStatus.style.color = "var(--aura-warning)";
+    saveTimer = setTimeout(() => {
+      try { localStorage.setItem("mtw_markdown", md); } catch (e) {}
+      savedStatus.textContent = "✓ saved";
+      savedStatus.style.color = "var(--aura-success)";
+    }, 800);
+  }
+
+  mdInput.addEventListener("input", () => {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 60);
+  });
+  mdInput.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      e.preventDefault();
+      triggerExport("docx");
+    }
+  });
+
+  // ---------- File import ----------
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      mdInput.value = ev.target.result;
+      render();
+      toast("Imported " + file.name, "success");
+    };
+    reader.readAsText(file);
+    fileInput.value = "";
+  });
+
+  // ---------- Templates ----------
+  const TEMPLATES = {
+    blank: "",
+    report: `# Quarterly Report\n\n## Executive Summary\n\nProvide a brief overview of key findings and outcomes.\n\n## Metrics\n\n- Revenue: \$0\n- Growth: +0%\n- Customers: 0\n\n## Conclusion\n\nNext steps and recommendations.\n`,
+    letter: `# [Date]\n\n[Recipient Name]\n[Recipient Title]\n[Organization]\n[Address]\n\nDear [Recipient Name],\n\nI am writing to you regarding...\n\nPlease let me know if you require any additional information.\n\nSincerely,\n\n[Your Name]\n[Your Title]\n`,
+    resume: `# [Your Name]\n[City, State] · [Phone] · [Email] · [LinkedIn]\n\n## Summary\n\nBrief professional summary highlighting key strengths and experience.\n\n## Experience\n\n### [Job Title] — [Company]\n_[Start Date] – [End Date]_\n\n- Key achievement one\n- Key achievement two\n\n## Education\n\n### [Degree] — [Institution]\n_[Graduation Year]_\n\n## Skills\n\n- Skill one · Skill two · Skill three\n`
+  };
+  function buildTemplateMenu() {
+    templateMenu.innerHTML = "";
+    Object.entries(TEMPLATES).forEach(([key, content]) => {
+      const btn = document.createElement("button");
+      btn.className = "dropdown-item";
+      btn.innerHTML = `<strong style="color:var(--aura-indigo-light)">📄 ${key.charAt(0).toUpperCase() + key.slice(1)}</strong><span style="margin-left:auto;font-size:0.75rem;color:var(--aura-text-muted)">Insert</span>`;
+      btn.addEventListener("click", () => {
+        if (mdInput.value.trim() && !confirm("This will replace your current content. Continue?")) return;
+        mdInput.value = content;
+        render();
+        toast("Template inserted: " + key, "success");
+        exportDropdown.classList.remove("open");
+      });
+      templateMenu.appendChild(btn);
+    });
+  }
+  templateBtn.addEventListener("click", () => {
+    exportDropdown.classList.remove("open");
+    templateDropdownToggle();
+  });
+  let templateOpen = false;
+  function templateDropdownToggle() {
+    templateOpen = !templateOpen;
+    templateMenu.style.display = templateOpen ? "block" : "none";
+    if (templateOpen && templateMenu.children.length === 0) buildTemplateMenu();
+  }
+  templateBtn.addEventListener("click", (e) => { e.stopPropagation(); templateDropdownToggle(); });
+
+  // Close dropdowns on outside click
+  document.addEventListener("click", (e) => {
+    if (!exportDropdown.contains(e.target)) exportDropdown.classList.remove("open");
+    if (!templateBtn.contains(e.target) && !templateMenu.contains(e.target)) templateOpen = false, templateMenu.style.display = "none";
+  });
+
+  // ---------- Clear ----------
+  clearBtn.addEventListener("click", () => {
+    if (!mdInput.value.trim()) return;
+    if (confirm("Clear the editor?")) {
+      mdInput.value = "";
+      render();
+      toast("Editor cleared", "warn");
+    }
+  });
+
+  // ---------- Copy preview ----------
+  copyPreviewBtn.addEventListener("click", () => {
+    const text = preview.innerText || preview.textContent;
+    if (!text.trim()) return toast("Nothing to copy", "warn");
+    navigator.clipboard.writeText(text).then(() => toast("Preview copied to clipboard", "success"));
+  });
+
+  // ---------- Expand panes ----------
+  function makeExpandable(btn, paneSelector) {
+    btn.addEventListener("click", () => {
+      const pane = document.querySelector(paneSelector);
+      const expanded = pane.classList.toggle("expanded");
+      btn.textContent = expanded ? "↘" : "↗";
+      btn.title = expanded ? "Collapse" : "Expand";
+      render();
+    });
+  }
+  makeExpandable(expandEditor, ".editor-pane");
+  makeExpandable(expandPreview, ".preview-pane");
+
+  // ---------- Toasts ----------
+  function toast(msg, type = "info") {
+    const el = document.createElement("div");
+    el.className = "toast " + (type === "success" ? "success" : type === "warn" ? "warn" : "");
+    el.innerHTML = `<div class="toast-title">${escHtml(msg)}</div>`;
+    toastContainer.appendChild(el);
+    setTimeout(() => { el.style.opacity = "0"; setTimeout(() => el.remove(), 300); }, 2400);
+  }
+  function escHtml(str) {
+    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // ---------- Load saved draft ----------
+  try {
+    const saved = localStorage.getItem("mtw_markdown");
+    if (saved !== null) mdInput.value = saved;
+  } catch (e) {}
+  render();
+  loadTheme();
+
+  // =========================================================
+  //  DOCX GENERATOR (genuine Office Open XML, client-side)
+  // =========================================================
+
+  // --- XML helpers ---
+  function buildAttrs(obj) {
+    let s = "";
+    for (const k in obj) {
+      if (obj[k] !== undefined) s += ` ${k}="${escXml(String(obj[k]))}"`;
+    }
+    return s;
+  }
+
+  // Convert HTML (from marked) -> WordprocessingML body content.
+  // All inline text is emitted inside <w:r><w:t>...</w:t></w:t> runs so the
+  // resulting document.xml is valid OOXML and opens cleanly in Word.
+
+  // Emit inline children of `node` as a sequence of <w:r> elements.
+  // `extraRpr` is an accumulated run-properties string (bold/italic/etc.)
+  // applied to every run emitted by this call and its descendants.
+  function runsFrom(node, extraRpr) {
+    let out = "";
+    let buf = "";
+    const baseRpr = extraRpr || "";
+    function flush() {
+      if (buf) {
+        out += `<w:r>${baseRpr ? `<w:rPr>${baseRpr}</w:rPr>` : ""}<w:t xml:space="preserve">${escXml(buf)}</w:t></w:r>`;
+        buf = "";
+      }
+    }
+    for (const child of Array.from(node.childNodes)) {
+      if (child.nodeType === 3) {
+        buf += child.textContent;
+      } else if (child.nodeType === 8) {
+        continue;
+      } else {
+        const tag = child.nodeName.toLowerCase();
+        flush(); // element boundary ends the current text run
+        if (tag === "br") {
+          out += `<w:r>${baseRpr ? `<w:rPr>${baseRpr}</w:rPr>` : ""}<w:br/></w:r>`;
+        } else if (tag === "strong" || tag === "b") {
+          out += runsFrom(child, baseRpr + "<w:b/>");
+        } else if (tag === "em" || tag === "i") {
+          out += runsFrom(child, baseRpr + "<w:i/>");
+        } else if (tag === "u") {
+          out += runsFrom(child, baseRpr + '<w:u w:val="single"/>');
+        } else if (tag === "code") {
+          out += `<w:r><w:rPr>${baseRpr}<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New"/></w:rPr><w:t xml:space="preserve">${escXml(child.textContent)}</w:t></w:r>`;
+        } else if (tag === "a") {
+          const inner = runsFrom(child, baseRpr + '<w:color w:val="06B6D4"/><w:u w:val="single"/>');
+          out += inner || `<w:r><w:rPr>${baseRpr}<w:color w:val="06B6D4"/><w:u w:val="single"/></w:rPr><w:t xml:space="preserve">${escXml(child.getAttribute("href") || "")}</w:t></w:r>`;
+        } else {
+          out += runsFrom(child, baseRpr);
+        }
+      }
+    }
+    flush();
+    return out;
+  }
+
+  function emptyRun() {
+    return `<w:r><w:t></w:t></w:r>`;
+  }
+
+  function htmlToWordml(node) {
+    const tag = node.nodeName ? node.nodeName.toLowerCase() : "";
+    const isText = node.nodeType === 3;
+    const isComment = node.nodeType === 8;
+
+    if (isText) return "";      // text is handled by runsFrom callers
+    if (isComment) return "";
+
+    switch (tag) {
+      case "body":
+      case "div":
+        return Array.from(node.childNodes).map(htmlToWordml).join("");
+
+      case "p": {
+        const inner = runsFrom(node);
+        return `<w:p>${inner || emptyRun()}</w:p>`;
+      }
+
+      case "h1": return `<w:p><w:pPr><w:pStyle w:val="Title"/></w:pPr>${runsFrom(node) || emptyRun()}</w:p>`;
+      case "h2": return `<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr>${runsFrom(node) || emptyRun()}</w:p>`;
+      case "h3": return `<w:p><w:pPr><w:pStyle w:val="Heading2"/></w:pPr>${runsFrom(node) || emptyRun()}</w:p>`;
+      case "h4": return `<w:p><w:pPr><w:pStyle w:val="Heading3"/></w:pPr>${runsFrom(node) || emptyRun()}</w:p>`;
+      case "h5": return `<w:p><w:pPr><w:pStyle w:val="Heading4"/></w:pPr>${runsFrom(node) || emptyRun()}</w:p>`;
+      case "h6": return `<w:p><w:pPr><w:pStyle w:val="Heading5"/></w:pPr>${runsFrom(node) || emptyRun()}</w:p>`;
+
+      case "br": return `<w:r><w:br/></w:r>`;
+      case "hr": return `<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="4" w:space="1" w:color="auto"/></w:pBdr></w:pPr><w:r><w:br/></w:r></w:p>`;
+
+      case "pre": {
+        return `<w:p><w:pPr><w:spacing w:before="120" w:after="120"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Courier New" w:hAnsi="Courier New"/></w:rPr><w:t xml:space="preserve">${escXml(node.textContent)}</w:t></w:r></w:p>`;
+      }
+
+      case "ul": {
+        const items = Array.from(node.children).filter(c => c.nodeName.toLowerCase() === "li");
+        return items.map((li, i) => {
+          return `<w:p><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:r><w:t xml:space="preserve">• </w:t></w:r>${runsFrom(li) || emptyRun()}</w:p>`;
+        }).join("");
+      }
+
+      case "ol": {
+        const items = Array.from(node.children).filter(c => c.nodeName.toLowerCase() === "li");
+        return items.map((li, i) => {
+          const marker = (i + 1) + ". ";
+          return `<w:p><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:r><w:t xml:space="preserve">${escXml(marker)}</w:t></w:r>${runsFrom(li) || emptyRun()}</w:p>`;
+        }).join("");
+      }
+
+      case "li":
+        // Handled by the parent ul/ol above; returned directly only as a fallback.
+        return runsFrom(node);
+
+      case "blockquote": {
+        const ps = Array.from(node.childNodes).filter(c => c.nodeName.toLowerCase() === "p");
+        if (ps.length) {
+          return ps.map(p => {
+            const inner = runsFrom(p);
+            return `<w:p><w:pPr><w:ind w:left="1080" w:right="360"/><w:pBdr><w:left w:val="single" w:sz="18" w:space="4" w:color="3730A3"/></w:pBdr><w:spacing w:before="120" w:after="120"/></w:pPr>${inner || emptyRun()}</w:p>`;
+          }).join("");
+        }
+        const inner = runsFrom(node);
+        return `<w:p><w:pPr><w:ind w:left="1080" w:right="360"/><w:pBdr><w:left w:val="single" w:sz="18" w:space="4" w:color="3730A3"/></w:pBdr><w:spacing w:before="120" w:after="120"/></w:pPr>${inner || emptyRun()}</w:p>`;
+      }
+
+      case "table": {
+        return htmlTableToWordml(node);
+      }
+
+      case "thead": case "tbody":
+        return Array.from(node.childNodes).map(htmlToWordml).join("");
+      case "tr":
+        return `<w:tr>${Array.from(node.childNodes).map(htmlToWordml).join("")}</w:tr>`;
+      case "th": case "td": {
+        const isHeader = tag === "th";
+        const width = node.getAttribute("data-w") || "2068";
+        const inner = runsFrom(node);
+        const rpr = isHeader ? "<w:b/><w:color w:val=\"06B6D4\"/>" : "";
+        return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/><w:shd ${isHeader ? 'w:val="clear" w:color="auto" w:fill="1E293B"' : 'w:val="clear" w:color="auto" w:fill="auto"'}/></w:tcPr><w:p><w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr>${inner || `<w:r><w:rPr>${rpr}</w:rPr><w:t></w:t></w:r>`}</w:p></w:tc>`;
+      }
+
+      default:
+        return Array.from(node.childNodes).map(htmlToWordml).join("");
+    }
+  }
+
+  function htmlTableToWordml(table) {
+    const rows = Array.from(table.rows);
+    if (!rows.length) return "";
+    const colCount = Math.max(...rows.map(r => r.cells.length));
+    const widths = Array(colCount).fill(2068);
+    // attempt to read widths from first row cells data-w attr
+    const firstRow = rows[0];
+    for (let c = 0; c < firstRow.cells.length; c++) {
+      const w = firstRow.cells[c].getAttribute("data-w");
+      if (w) widths[c] = w;
+    }
+    const grid = widths.map(w => `<w:gridCol w:w="${w}" w:type="dxa"/>`).join("");
+
+    // borders
+    const borders = `<w:top w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:left w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:right w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="auto"/>`;
+
+    let xml = `<w:tbl><w:tblPr><w:tblW w:w="${widths.join(",")}" w:type="dxa"/><w:tblBorders>${borders}</w:tblBorders></w:tblPr><w:tblGrid>${grid}</w:tblGrid>`;
+    for (const row of rows) {
+      xml += "<w:tr>";
+      for (let c = 0; c < colCount; c++) {
+        const cell = row.cells[c] || null;
+        const isHeader = cell && cell.nodeName.toLowerCase() === "th";
+        const w = cell ? (cell.getAttribute("data-w") || widths[c]) : widths[c];
+        const shd = isHeader ? 'w:val="clear" w:color="auto" w:fill="1E293B"' : 'w:val="clear" w:color="auto" w:fill="auto"';
+        const rpr = isHeader ? "<w:b/><w:color w:val=\"06B6D4\"/>" : "";
+        const inner = cell ? runsFrom(cell) : "";
+        xml += `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/><w:shd ${shd}/></w:tcPr><w:p><w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr>${inner || `<w:r><w:rPr>${rpr}</w:rPr><w:t></w:t></w:r>`}</w:p></w:tc>`;
+      }
+      xml += "</w:tr>";
+    }
+    xml += "</w:tbl>";
+    return xml;
+  }
+
+  // --- DOCX parts ---
+  function coreXml(title) {
+    const now = new Date();
+    const iso = now.toISOString().replace(/\.\d{3}Z$/, "Z");
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>${escXml(title)}</dc:title>
+  <dcterms:created xsi:type="dcterms:W3CDTF">${iso}</dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">${iso}</dcterms:modified>
+  <dc:creator>Aura Markdown Converter</dc:creator>
+</cp:coreProperties>`;
+  }
+
+  function contentTypesXml() {
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-officedocument.core-properties+xml"/>
+</Types>`;
+  }
+
+  function relsXml() {
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="word/styles.xml"/>
+</Relationships>`;
+  }
+
+  function docRelsXml() {
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>`;
+  }
+
+  function stylesXml() {
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/><w:sz w:val="22"/><w:color w:val="1F2937"/></w:rPr></w:rPrDefault>
+    <w:pPrDefault><w:pPr><w:spacing w:after="240" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault>
+  </w:docDefaults>
+  <w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
+  <w:style w:type="paragraph" w:styleId="Title"><w:name w:val="title"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:link w:val="TitleChar"/><w:pPr><w:spacing w:before="0" w:after="240" w:line="276" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:sz w:val="40"/><w:color w:val="3730A3"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="Heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:link w:val="Heading1Char"/><w:pPr><w:keepNext/><w:spacing w:before="240" w:after="120" w:line="276" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:sz w:val="32"/><w:color w:val="3730A3"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="Heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:link w:val="Heading2Char"/><w:pPr><w:keepNext/><w:spacing w:before="200" w:after="80" w:line="276" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:sz w:val="28"/><w:color w:val="06B6D4"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Heading3"><w:name w:val="Heading 3"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:link w:val="Heading3Char"/><w:pPr><w:keepNext/><w:spacing w:before="160" w:after="60" w:line="276" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:sz w:val="26"/><w:color w:val="1F2937"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Heading4"><w:name w:val="Heading 4"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:link w:val="Heading4Char"/><w:pPr><w:keepNext/><w:spacing w:before="140" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:sz w:val="24"/><w:color w:val="1F2937"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="Heading5"><w:name w:val="Heading 5"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:link w:val="Heading5Char"/><w:pPr><w:spacing w:before="120" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:sz w:val="22"/><w:color w:val="1F2937"/></w:rPr></w:style>
+</w:styles>`;
+  }
+
+  function documentXml(md) {
+    const html = parseMarkdown(md);
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    const body = htmlToWordml(tmp);
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" w:macrosPresent="false" w:xmlEmbedded="false">
+  <w:body>${body}</w:body>
+</w:document>`;
+  }
+
+  // --- Minimal ZIP writer (stored/uncompressed entries) ---
+  const CRC_TABLE = (() => {
+    const table = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[i] = c;
+    }
+    return table;
+  })();
+  function crc32(bytes) {
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ bytes[i]) & 0xFF];
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function writeLE(view, offset, value, bytes) {
+    for (let i = 0; i < bytes; i++) view.setUint8(offset + i, (value >> (8 * i)) & 0xFF);
+  }
+  function strToBytes(str) {
+    return new TextEncoder().encode(str);
+  }
+
+  function createZip(files) {
+    // files: { name: stringContent }
+    const now = new Date();
+    const dosTime = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() / 2)) >>> 0;
+    const dosDate = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) >>> 0;
+
+    const entries = [];
+    for (const [name, content] of Object.entries(files)) {
+      const data = strToBytes(content);
+      entries.push({ name, data, crc: crc32(data), size: data.length });
+    }
+
+    // compute sizes
+    let localData = [];
+    let centralData = [];
+    let offset = 0;
+    for (const e of entries) {
+      const nameBytes = strToBytes(e.name);
+      const nameLen = nameBytes.length;
+      // local header 30 bytes + name + data
+      const rec = {
+        offset,
+        nameLen,
+        data: e.data,
+        crc: e.crc,
+        size: e.size
+      };
+      localData.push(rec);
+      centralData.push({ ...rec, nameBytes });
+      offset += 30 + nameLen + e.size;
+    }
+
+    const cdStart = offset;
+    let cdBytes = 0;
+    const centralRecords = [];
+    for (const rec of centralData) {
+      // 46 + namelen
+      const recLen = 46 + rec.nameBytes.length;
+      centralRecords.push(rec);
+      cdBytes += recLen;
+    }
+    const cdEnd = cdStart + cdBytes;
+
+    const totalSize = cdEnd + 22; // end of central directory record = 22 bytes
+
+    const buf = new ArrayBuffer(totalSize);
+    const view = new DataView(buf);
+    let p = 0;
+
+    // local file headers + data
+    for (const rec of localData) {
+      view.setUint32(p, 0x04034B50, true); p += 4;          // signature
+      view.setUint16(p, 20, true); p += 2;                   // version needed
+      view.setUint16(p, 0, true); p += 2;                    // flags
+      view.setUint16(p, 0, true); p += 2;                    // method 0 = stored
+      view.setUint16(p, dosTime, true); p += 2;
+      view.setUint16(p, dosDate, true); p += 2;
+      view.setUint32(p, rec.crc, true); p += 4;
+      view.setUint32(p, rec.size, true); p += 4;             // compressed size
+      view.setUint32(p, rec.size, true); p += 4;             // uncompressed size
+      view.setUint16(p, rec.nameLen, true); p += 2;
+      view.setUint16(p, 0, true); p += 2;                    // extra length
+      const nameBytes = strToBytes(rec.name); // recompute name bytes
+      for (let i = 0; i < nameLen; i++) view.setUint8(p + i, nameBytes[i]);
+      p += nameLen;
+      for (let i = 0; i < rec.size; i++) view.setUint8(p + i, rec.data[i]);
+      p += rec.size;
+    }
+
+    // central directory
+    for (const rec of centralRecords) {
+      view.setUint32(p, 0x02014B50, true); p += 4;         // signature
+      view.setUint16(p, 0x0319, true); p += 2;             // version made by
+      view.setUint16(p, 20, true); p += 2;                 // version needed
+      view.setUint16(p, 0, true); p += 2;                  // flags
+      view.setUint16(p, 0, true); p += 2;                  // method
+      view.setUint16(p, dosTime, true); p += 2;
+      view.setUint16(p, dosDate, true); p += 2;
+      view.setUint32(p, rec.crc, true); p += 4;
+      view.setUint32(p, rec.size, true); p += 4;
+      view.setUint32(p, rec.size, true); p += 4;
+      view.setUint16(p, rec.nameLen, true); p += 2;
+      view.setUint16(p, 0, true); p += 2;                  // extra
+      view.setUint16(p, 0, true); p += 2;                  // comment
+      view.setUint16(p, 0, true); p += 2;                  // disk start
+      view.setUint16(p, 0, true); p += 2;                  // internal attr
+      view.setUint32(p, 0, true); p += 4;                  // external attr
+      view.setUint32(p, rec.offset, true); p += 4;         // local header offset
+      for (let i = 0; i < rec.nameLen; i++) view.setUint8(p + i, rec.nameBytes[i]);
+      p += rec.nameLen;
+    }
+
+    // end of central directory
+    view.setUint32(p, 0x06054B50, true); p += 4;
+    view.setUint16(p, 0, true); p += 2;                    // disk
+    view.setUint16(p, 0, true); p += 2;                    // cd disk
+    view.setUint16(p, centralRecords.length, true); p += 2;
+    view.setUint16(p, centralRecords.length, true); p += 2;
+    view.setUint32(p, cdBytes, true); p += 4;
+    view.setUint32(p, cdStart, true); p += 4;
+    view.setUint16(p, 0, true); p += 2;                    // comment len
+
+    return new Uint8Array(buf);
+  }
+
+  function downloadBlob(bytes, filename) {
+    const blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function safeFilename(base) {
+    return String(base).replace(/[^a-z0-9\-_]/gi, "_") || "document";
+  }
+
+  // =========================================================
+  //  EXPORTS
+  // =========================================================
+
+  function triggerExport(fmt) {
+    const md = mdInput.value;
+    const titleInput = document.getElementById("docTitle");
+    const title = (titleInput && titleInput.value.trim()) || "Aura Document";
+    const filenameBase = safeFilename(title);
+    const now = new Date();
+    const stamp = now.getFullYear() +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      String(now.getDate()).padStart(2, "0") + "_" +
+      String(now.getHours()).padStart(2, "0") +
+      String(now.getMinutes()).padStart(2, "0");
+
+    try {
+      if (fmt === "docx") {
+        const files = {
+          "[Content_Types].xml": contentTypesXml(),
+          "_rels/.rels": relsXml(),
+          "word/document.xml": documentXml(md),
+          "word/_rels/document.xml.rels": docRelsXml(),
+          "word/styles.xml": stylesXml(),
+          "docProps/core.xml": coreXml(title),
+        };
+        const zip = createZip(files);
+        downloadBlob(zip, `${filenameBase}_${stamp}.docx`);
+        toast("Exported Word document (.docx)", "success");
+      } else if (fmt === "html") {
+        const css = `<style>
+          body{font-family:Inter,sans-serif;line-height:1.6;color:#1e293b;max-width:800px;margin:40px auto;padding:0 20px}
+          h1,h2,h3,h4{font-family:Outfit,sans-serif;color:#0f172a}
+          code{background:#f1f5f9;padding:2px 6px;border-radius:4px}
+          pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:1rem;overflow-x:auto}
+          a{color:#06b6d4}
+        </style>`;
+        const htmlDoc = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${escXml(title)}</title>${css}</head><body>${parseMarkdown(md)}</body></html>`;
+        downloadBlob(strToBytes(htmlDoc), `${filenameBase}_${stamp}.html`);
+        toast("Exported HTML page", "success");
+      } else if (fmt === "md") {
+        downloadBlob(strToBytes(md), `${filenameBase}_${stamp}.md`);
+        toast("Exported Markdown (.md)", "success");
+      } else if (fmt === "txt") {
+        const plain = preview.innerText || preview.textContent || md;
+        downloadBlob(strToBytes(plain), `${filenameBase}_${stamp}.txt`);
+        toast("Exported plain text (.txt)", "success");
+      } else if (fmt === "print") {
+        const win = window.open("", "_blank");
+        win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${escXml(title)}</title>
+          <style>body{font-family:Inter,sans-serif;line-height:1.6;color:#111;padding:2rem} h1,h2,h3{color:#111} code{background:#f3f4f6;padding:2px 6px;border-radius:4px} pre{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:1rem;overflow:auto} @media print{body{padding:0}}</style>
+        </head><body>${parseMarkdown(md)}</body></html>`);
+        win.document.close();
+        win.focus();
+        setTimeout(() => { win.print(); win.close(); }, 500);
+        toast("Opening print dialog…", "info");
+      }
+    } catch (err) {
+      console.error(err);
+      toast("Export failed: " + err.message, "warn");
+    }
+  }
+
+  exportMenu.addEventListener("click", (e) => {
+    const item = e.target.closest(".dropdown-item");
+    if (!item) return;
+    const fmt = item.getAttribute("data-fmt");
+    exportDropdown.classList.remove("open");
+    triggerExport(fmt);
+  });
+
+  exportBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    exportDropdown.classList.toggle("open");
+  });
+
+  // initial load
+  render();
+  loadTheme();
+  document.getElementById("year").textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>
